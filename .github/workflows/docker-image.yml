@@ -54,37 +54,20 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-  security_scan:
-    name: Security Scanning with Trivy
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy Security Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: "your-docker-image:latest"
-          format: "table"
-          exit-code: "1"
-          ignore-unfixed: true
-
   docker_build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: [build, sonar_scan, security_scan]
+    needs: [build, sonar_scan]
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Login to DockerHub
+      - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.USER }}
-          password: ${{ secrets.PASS }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
         run: |
@@ -93,3 +76,30 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push akashigt/devsecops-python:latest
+
+  security_scan:
+    name: Security Scanning with Trivy
+    runs-on: ubuntu-latest
+    needs: docker_build
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull Docker Image
+        run: |
+          docker pull akashigt/devsecops-python:latest
+
+      - name: Run Trivy Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "akashigt/devsecops-python:latest"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
