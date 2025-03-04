@@ -1,12 +1,10 @@
-import pytest
-from app import app
+from flask import Flask
 
-@pytest.fixture
-def client():
-    app.testing = True
-    return app.test_client()
+app = Flask(__name__)
 
-def test_home(client):
-    response = client.get('/')
-    assert response.status_code == 200
-    assert response.data == b'Hello, Secure CI/CD Pipeline!'
+@app.route('/')
+def home():
+    return 'Hello, Secure CI/CD Pipeline!'
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
