@@ -28,9 +28,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Tests
-        run: pytest
+        run: |
+          export PYTHONPATH=$PWD
+          pytest --verbose
 
-    sonar_scan:
+  sonar_scan:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
     needs: build
@@ -52,7 +54,6 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-
   security_scan:
     name: Security Scanning with Trivy
     runs-on: ubuntu-latest
@@ -65,7 +66,30 @@ jobs:
       - name: Run Trivy Security Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "akashigt/devsecops-github-actions:latest"
+          image-ref: "your-docker-image:latest"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
+
+  docker_build:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [build, sonar_scan, security_scan]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASS }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t akashigt/devsecops-python:latest .
+
+      - name: Push Docker Image
+        run: |
+          docker push akashigt/devsecops-python:latest
