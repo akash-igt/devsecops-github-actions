@@ -102,4 +102,5 @@ jobs:
           image-ref: "akashigt/devsecops-python:latest"
           format: "table"
           exit-code: "1"
-          ignore-unfixed: true
+          ignore-unfixed: false
+          severity: "HIGH,CRITICAL"
