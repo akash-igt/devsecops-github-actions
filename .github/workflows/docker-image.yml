@@ -30,7 +30,7 @@ jobs:
       - name: Run Tests
         run: pytest
 
-  sonar_scan:
+    sonar_scan:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
     needs: build
@@ -44,6 +44,14 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=devsecops-python
+            -Dsonar.organization=devsecops-python
+            -Dsonar.sources=.
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
 
   security_scan:
     name: Security Scanning with Trivy
