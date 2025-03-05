@@ -44,15 +44,14 @@ jobs:
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v2
         env:
-          SONAR_HOST_URL: http://13.233.198.57:9000 \
-          SONAR_TOKEN: sqp_0b0cc2df45388a8c175fd87d8212f707079207aa
+          SONAR_HOST_URL: http://13.233.198.57:9000
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=task1-sonar-python \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=http://13.233.198.57:9000 \
-            -Dsonar.login=sqp_0b0cc2df45388a8c175fd87d8212f707079207aa
-          
+            -Dsonar.projectKey=task1-sonar-python
+            -Dsonar.sources=.
+            -Dsonar.host.url=http://13.233.198.57:9000
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
   docker_build:
     name: Build and Push Docker Image
