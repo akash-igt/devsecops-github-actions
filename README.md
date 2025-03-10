@@ -1,0 +1,1 @@
+Hi [Recipient's Name], I hope you're doing well. I wanted to update you that the PPT is nearly complete. I will finalize it and share it with you by tomorrow afternoon. Please let me know if you have any additional inputs. Thank you!
